@@ -2,75 +2,13 @@ import React, { Component } from "react";
 import "./Quiz.css";
 import ActiveQuiz from "../../components/ActiveQuiz/ActiveQuiz";
 import FinishedQuiz from "../../components/FinishedQuiz/FinishedQuiz";
-import axios from "../../axios/axios-quiz";
 import Loader from "../../components/UI/Loader/Loader";
+import { connect } from "react-redux";
+import { fetchQuizByID } from "../../store/actions/quiz";
 
-export default class Quiz extends Component {
-  state = {
-    results: {}, // {[id]: right wrong}
-    isFinished: false,
-    activeQuestion: 0,
-    answerState: null, //{[id]: 'right' 'wrong'}
-    quiz: [
-      /*  {
-        question: "What year did React appear?",
-        rightAnswerId: 2,
-        id: 1,
-        answers: [
-          { text: "2012", id: 1 },
-          { text: "2013", id: 2 },
-          { text: "2014", id: 3 },
-          { text: "2015", id: 4 },
-        ]
-      },
-      {
-        question: "Which company created React?",
-        rightAnswerId: 1,
-        id: 2,
-        answers: [
-          { text: "Facebook", id: 1 },
-          { text: "Apple", id: 2 },
-          { text: "Google", id: 3 },
-          { text: "Microsoft", id: 4 },
-        ],
-      },
-      {
-        question: "Which is used to keep the value of components unique?",
-        rightAnswerId: 3,
-        id: 3,
-        answers: [
-          { text: "Ref", id: 1 },
-          { text: "Store", id: 2 },
-          { text: "Key", id: 3 },
-          { text: "Data", id: 4 },
-        ],
-      },
-      {
-        question: "Which is used to pass the data from parent to child?",
-        rightAnswerId: 4,
-        id: 4,
-        answers: [
-          { text: "State", id: 1 },
-          { text: "Components", id: 2 },
-          { text: "Render", id: 3 },
-          { text: "Props", id: 4 },
-        ],
-      },
-      {
-        question: "Who developed React.js?",
-        rightAnswerId: 3,
-        id: 5,
-        answers: [
-          { text: "Jordan Lee", id: 1 },
-          { text: "Jordan Mike", id: 2 },
-          { text: "Jordan Walke", id: 3 },
-          { text: "Mark Zuckerberg", id: 4 },
-        ],
-      }, */
-    ],
-    loading: true,
-  };
 
+export class Quiz extends Component {
+  
   onAnswerClickHandler = (answerId) => {
     //to fix bug if user clicked many times on right answer
     if (this.state.answerState) {
@@ -80,8 +18,8 @@ export default class Quiz extends Component {
       }
     }
 
-    const question = this.state.quiz[this.state.activeQuestion];
-    const results = this.state.results;
+    const question = this.props.quiz[this.props.activeQuestion];
+    const results = this.props.results;
 
     if (answerId === question.rightAnswerId) {
       if (!results[question.id]) {
@@ -128,18 +66,8 @@ export default class Quiz extends Component {
     });
   };
 
-  async componentDidMount() {
-    try {
-      const response = await axios.get(`quizes/${this.props.match.params.id}.json`);
-      const quiz = response.data;
-
-      this.setState({
-        quiz,
-        loading: false,
-      });
-    } catch (error) {
-      console.log(error);
-    }
+  componentDidMount() {
+    this.props.fetchQuizByID(this.props.match.params.id);
   }
 
   render() {
@@ -150,22 +78,22 @@ export default class Quiz extends Component {
             How well do you know?
           </h1>
 
-          {this.state.loading ? (
+          {this.props.loading || !this.props.quiz ? (
             <Loader />
-          ) : this.state.isFinished ? (
+          ) : this.props.isFinished ? (
             <FinishedQuiz
-              results={this.state.results}
-              quiz={this.state.quiz}
+              results={this.props.results}
+              quiz={this.props.quiz}
               onRepeat={this.repeatHandler}
             />
           ) : (
             <ActiveQuiz
-              question={this.state.quiz[this.state.activeQuestion].question}
-              answers={this.state.quiz[this.state.activeQuestion].answers}
+              question={this.props.quiz[this.props.activeQuestion].question}
+              answers={this.props.quiz[this.props.activeQuestion].answers}
               onAnswerClick={this.onAnswerClickHandler}
-              quizLength={this.state.quiz.length}
-              answerNumber={this.state.activeQuestion + 1}
-              answerState={this.state.answerState}
+              quizLength={this.props.quiz.length}
+              answerNumber={this.props.activeQuestion + 1}
+              answerState={this.props.answerState}
             />
           )}
         </div>
@@ -173,3 +101,22 @@ export default class Quiz extends Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    results: state.quiz.results, 
+    isFinished: state.quiz.isFinished,
+    activeQuestion: state.quiz.activeQuestion,
+    answerState: state.quiz.answerState, 
+    quiz: state.quiz.quiz,
+    loading: state.quiz.loading
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    fetchQuizByID: id => dispatch(fetchQuizByID(id))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Quiz);

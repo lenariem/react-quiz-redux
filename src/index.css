@@ -1,0 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Koh+Santepheap&display=swap'); 
+
+body {
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Koh Santepheap', cursive;
+  font-size: 1.2rem;
+}
+

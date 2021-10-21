@@ -1,0 +1,32 @@
+.ActiveQuiz {
+    padding: 10px 20px;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    font-weight: 600;
+}
+
+.Question {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 1.3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Question span {
+    width: 80%;
+}
+
+.Question small {
+    font-family: Arial, Helvetica, sans-serif;
+    letter-spacing: 0px;
+    width: 20%;
+    text-align: right;
+    align-self: flex-start;
+    
+}
